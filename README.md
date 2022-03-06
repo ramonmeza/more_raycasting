@@ -7,8 +7,9 @@
 ## Todo
 
 - Texturing based on tileset from level resource
-- Atmospheric fog
-- Sprite details
+- ~~Atmospheric fog~~ (basically working)
+- Floors/Walls with fog and textures
+- Static sprite objects
 - Enemies
 
 

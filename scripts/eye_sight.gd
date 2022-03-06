@@ -65,3 +65,7 @@ func get_ray_count() -> int:
 
 func get_rays() -> Array:
 	return get_children()
+
+
+func get_distance() -> float:
+	return distance

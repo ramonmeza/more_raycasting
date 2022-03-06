@@ -5,14 +5,18 @@ extends ViewportContainer
 onready var render_target: RenderTarget = $Viewport/RenderTarget
 
 export var scale: float = 4.0
+export var fog_multiplier: float = 100.0
 
 var level_resource: LevelResource = null
 
 
 func render(eye_sight: EyeSight):
-	var ceilings: PoolVector2Array = []
-	var walls: PoolVector2Array = []
-	var floors: PoolVector2Array = []
+	if eye_sight == null:
+		return
+	
+	var ceilings: Array = []
+	var walls: Array = []
+	var floors: Array = []
 	
 	var rays: Array = eye_sight.get_rays()
 	for i in len(rays):
@@ -30,15 +34,14 @@ func render(eye_sight: EyeSight):
 			var floor_start: float = wall_end
 			var floor_end: float = get_size().y
 			
-			# todo fix this?
+			# horizontal distance works, but vertical distance?
+			var intensity = get_object_intensity(dist, eye_sight.get_distance()) / dist * fog_multiplier
+			
 			var x: float = i
-			ceilings.append(Vector2(x, ceiling_start))
-			ceilings.append(Vector2(x, ceiling_end))
-			walls.append(Vector2(x, wall_start))
-			walls.append(Vector2(x, wall_end))
-			floors.append(Vector2(x, floor_start))
-			floors.append(Vector2(x, floor_end))
-	
+			ceilings.append(LineData.new(Vector2(x, ceiling_start), Vector2(x, ceiling_end), Color.red))
+			walls.append(LineData.new(Vector2(x, wall_start), Vector2(x, wall_end), Color.green * intensity))
+			floors.append(LineData.new(Vector2(x, floor_start), Vector2(x, floor_end), Color.blue))
+
 	draw_environment(ceilings, walls, floors)
 	render_target.get_viewport().set_size(Vector2(len(rays), get_size().y))
 
@@ -48,14 +51,28 @@ func _process(_delta):
 	set_rotation(0)
 
 
+func get_object_intensity(dist: float, max_dist: float) -> float:
+	if dist >= max_dist:
+		return 0.0
+	
+	elif dist >= max_dist * 0.75:
+		return 0.25
+	
+	elif dist >= max_dist * 0.5:
+		return 0.5
+	
+	elif dist >= max_dist * 0.25:
+		return 0.75
+	
+	return 1.0
+
 func set_level(level: Level):
 	level_resource = level.get_resource()
 
 
-func draw_environment(ceilings: PoolVector2Array,
-					  walls: PoolVector2Array,
-					  floors: PoolVector2Array):
-	render_target.add_layer(ceilings, Color.red)
-	render_target.add_layer(walls, Color.green)
-	render_target.add_layer(floors, Color.blue)
+func draw_environment(ceilings: Array, walls: Array, floors: Array):
+	
+	render_target.add_lines(ceilings)
+	render_target.add_lines(walls)
+	render_target.add_lines(floors)
 	render_target.update()

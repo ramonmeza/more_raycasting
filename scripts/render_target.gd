@@ -3,19 +3,27 @@ extends Control
 
 
 # array of LayerData
-var layers: Array = []
+var line_data: Array = []
 var line_width: float = 1.0
 
 
-func add_layer(lines: PoolVector2Array, color: Color):
-	layers.append(LayerData.new(lines, color))
-	update()
-
+func add_lines(lines: Array):
+	# array of LineData
+	line_data.append_array(lines)
 
 func _draw():
-	for layer in layers:
-		if len(layer.lines) >= 2 and len(layer.lines) % 2 == 0:
-			draw_multiline(layer.lines, layer.color, line_width)
+	var points: PoolVector2Array = []
+	var colors: PoolColorArray = []
+	
+	for line in line_data:
+		points.append(line.start)
+		points.append(line.end)
+		colors.append(line.color)
+		colors.append(line.color)
+	
+	if len(points) > 0: 
+		draw_multiline_colors(points, colors)
+	line_data.clear()
 
 
 class LayerData:
