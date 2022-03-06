@@ -3,7 +3,7 @@ extends Node2D
 
 
 export var fov: float = 90.0
-export var distance: float = 200.0
+export var distance: float = 2000.0
 export var ray_count: int = 90 setget set_ray_count, get_ray_count
 
 

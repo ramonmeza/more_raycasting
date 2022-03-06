@@ -16,9 +16,10 @@ func _ready():
 	
 	debug_menu.fov_property_slider.connect("value_changed", self, "handle_change", ["fov"])
 	debug_menu.distance_property_slider.connect("value_changed", self, "handle_change", ["distance"])
+	
+	debug_menu.fov_property_slider.set_value(90)
+	debug_menu.distance_property_slider.set_value(2000)
 
-	handle_change(game.get_player().get_eye_sight().fov, "fov")
-	handle_change(game.get_player().get_eye_sight().distance, "distance")
 
 func _process(_delta):
 	raycast_renderer.render(game.get_player().get_eye_sight())

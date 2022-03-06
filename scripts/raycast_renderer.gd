@@ -5,7 +5,7 @@ extends ViewportContainer
 onready var render_target: RenderTarget = $Viewport/RenderTarget
 
 export var scale: float = 4.0
-export var fog_multiplier: float = 100.0
+export var fog_multiplier: float = 1.0
 
 var level_resource: LevelResource = null
 
@@ -35,7 +35,7 @@ func render(eye_sight: EyeSight):
 			var floor_end: float = get_size().y
 			
 			# horizontal distance works, but vertical distance?
-			var intensity = get_object_intensity(dist, eye_sight.get_distance()) / dist * fog_multiplier
+			var intensity = get_object_intensity(dist, eye_sight.get_distance()) * fog_multiplier
 			
 			var x: float = i
 			ceilings.append(LineData.new(Vector2(x, ceiling_start), Vector2(x, ceiling_end), Color.red))
@@ -52,26 +52,16 @@ func _process(_delta):
 
 
 func get_object_intensity(dist: float, max_dist: float) -> float:
-	if dist >= max_dist:
-		return 0.0
-	
-	elif dist >= max_dist * 0.75:
-		return 0.25
-	
-	elif dist >= max_dist * 0.5:
-		return 0.5
-	
-	elif dist >= max_dist * 0.25:
-		return 0.75
-	
-	return 1.0
+	if max_dist == 0.0:
+		return 1.0
+	return 1.0 - ((dist / max_dist) * 2.0)
+
 
 func set_level(level: Level):
 	level_resource = level.get_resource()
 
 
 func draw_environment(ceilings: Array, walls: Array, floors: Array):
-	
 	render_target.add_lines(ceilings)
 	render_target.add_lines(walls)
 	render_target.add_lines(floors)
